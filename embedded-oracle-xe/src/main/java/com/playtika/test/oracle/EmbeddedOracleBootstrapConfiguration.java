@@ -37,10 +37,8 @@ import org.testcontainers.containers.OracleContainer;
 
 import java.util.LinkedHashMap;
 
-import static com.playtika.test.common.utils.ContainerUtils.containerLogsConsumer;
-import static com.playtika.test.oracle.OracleProperties.BEAN_NAME_EMBEDDED_ORACLE;
-import static com.playtika.test.oracle.OracleProperties.ORACLE_DB;
-import static com.playtika.test.oracle.OracleProperties.ORACLE_PORT;
+import static com.playtika.test.common.utils.ContainerUtils.configureCommonsAndStart;
+import static com.playtika.test.oracle.OracleProperties.*;
 
 @Slf4j
 @Configuration
@@ -59,11 +57,8 @@ public class EmbeddedOracleBootstrapConfiguration {
                 new OracleContainer(properties.dockerImage)
                         .withUsername(properties.getUser())
                         .withPassword(properties.getPassword())
-                        .withLogConsumer(containerLogsConsumer(log))
-                        .withStartupTimeout(properties.getTimeoutDuration())
-                        .withInitScript(properties.initScriptPath)
-                        .withReuse(properties.isReuseContainer());
-        oracle.start();
+                        .withInitScript(properties.initScriptPath);
+        oracle = (OracleContainer) configureCommonsAndStart(oracle, properties, log);
         registerOracleEnvironment(oracle, environment, properties);
         return oracle;
     }
